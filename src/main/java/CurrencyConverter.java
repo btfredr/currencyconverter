@@ -16,10 +16,26 @@ import java.net.URI;
 import java.util.*;
 
 public class CurrencyConverter extends Application {
-    private String apiUrl = "https://api.currencyapi.com/v3/latest?apikey=cur_live_oA4z9KL3fzjjCuiSA1EzZT38Bc5ioiW13A2k2lo8";
+    private final String API_KEY = "cur_live_oA4z9KL3fzjjCuiSA1EzZT38Bc5ioiW13A2k2lo8"; // Api key
+    private final String BASE_CURRENCY = "NOK"; // Standard currency used for conversion
+    private Map<String, Double> currencyRates = new HashMap<>(); // Saving rates
 
     @Override
     public void start(Stage stage) {
-        Label title = new Label("Please select currency to convert");
+        // UI components
+
+        TextField amount = new TextField();
+        amount.setPromptText("Enter amount"); // Placeholder when empty
+
+        // ComboBox to choose "from" currency
+        ComboBox<String> fromCurrency = new ComboBox<>();
+        fromCurrency.setPromptText("Choose currency"); // Placeholder text when field is empty
+
+        // ComboBox to choose "to" currency
+        ComboBox<String> toCurrency = new ComboBox<>();
+        toCurrency.setPromptText("Choose currency");
+
+
+
     }
 }
