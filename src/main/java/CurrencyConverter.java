@@ -35,7 +35,18 @@ public class CurrencyConverter extends Application {
         ComboBox<String> toCurrency = new ComboBox<>();
         toCurrency.setPromptText("Choose currency");
 
+        Button calculate = new Button("Calculate");
 
+        Label result = new Label("Result: ");
 
+        // VBox to create user interface with elements vertically aligned with 10px space
+        VBox root = new VBox(10, new Label("Currency converter"), amount, fromCurrency, toCurrency, calculate, result);
+        root.setPadding(new Insets(10));
+
+        Scene scene = new Scene(root, 400, 400);
+
+        stage.setScene(stage);
+        stage.setTitle("Currency converter");
+        stage.show();
     }
 }
