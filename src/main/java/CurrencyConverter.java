@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.lang.classfile.Label;
 import java.net.URI;
 import java.util.*;
 
@@ -71,6 +72,48 @@ public class CurrencyConverter extends Application {
             }
         });
     }
+
+    private void getCurrencyRates(ComboBox<String> fromCurrency, ComboBox<String> toCurrency) {
+        // Creating a task to run the API call in the background
+        Task<Map<String, Double>> task = new Task<>();
+        @Override
+        protected Map<String, Double> call() throws Exception {
+            // Creating a HTTP client to send a request
+            HttpClient client = HttpClient.newHttpClient();
+
+            // API URL with key and base currency
+            String url = String.format("https://api.currencyapi.com/v3/latest?apikey=%s&base_currency=%s",
+                    API_KEY, BASE_CURRENCY);
+
+            // GET request
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+
+            // Sending the request and recieving a response
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // Check HTTP status code
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("API error: HTTP "+ response.statusCode());
+            }
+
+            // Parse JSON data with Jackson
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.body());
+            JsonNode data = root.path("data");
+
+            // Building map with currency rates
+            Map<String, Double> rates = new HashMap<>();
+            for (JsonNode node : data) {
+                String valuta = node.path("code").asText();
+                double rate = node.path("value").asDouble();
+                rates.put(currency, rate);
+            }
+            return rates;
+        }
+    };
 
     public static void main(String[] args) {
         launch(args);
