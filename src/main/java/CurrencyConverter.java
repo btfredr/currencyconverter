@@ -113,7 +113,27 @@ public class CurrencyConverter extends Application {
             }
             return rates;
         }
+
+        // Handle successful response
+        task.setOnSucceed(e -> {
+            currencyRates = task.getValue();
+            List<String> currencies = new ArrayList<>(currencyRates.keySet());
+            Collection.sort(currencies);
+            fromCurrency.setItems(FXCollections.observableArrayList(currencies));
+            toCurrency.setItems(FXCollections.observableArrayList(currencies));
+            fromCurrency.setValue("NOK");
+            toCurrency.setValue("USD");
+        });
+
+        // Handle unsuccessful rseponse
+        task.setOnFailed(e -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContextText("Error while fetching rates. " + task.getException().getMessage());
+            alert.show();
+        });
     };
+
+
 
     public static void main(String[] args) {
         launch(args);
