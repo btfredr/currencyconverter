@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.lang.classfile.Label;
+import javafx.scene.control.Label;
 import java.net.URI;
 import java.util.*;
 
@@ -62,7 +62,7 @@ public class CurrencyConverter extends Application {
             }
 
             try {
-                double amount = Double.parseDouble(amountStr.replace(",", ","));
+                double amount = Double.parseDouble(amountStr.replace(",", "."));
                 double rateFrom = currencyRates.getOrDefault(from, 1.0);
                 double rateTo = currencyRates.getOrDefault(to, 1.0);
                 double converted = amount * (rateTo / rateFrom);
@@ -75,7 +75,7 @@ public class CurrencyConverter extends Application {
 
     private void getCurrencyRates(ComboBox<String> fromCurrency, ComboBox<String> toCurrency) {
         // Creating a task to run the API call in the background
-        Task<Map<String, Double>> task = new Task<>();
+        Task<Map<String, Double>> task = new Task<>() {
         @Override
         protected Map<String, Double> call() throws Exception {
             // Creating a HTTP client to send a request
@@ -107,18 +107,18 @@ public class CurrencyConverter extends Application {
             // Building map with currency rates
             Map<String, Double> rates = new HashMap<>();
             for (JsonNode node : data) {
-                String valuta = node.path("code").asText();
+                String currency = node.path("code").asText();
                 double rate = node.path("value").asDouble();
                 rates.put(currency, rate);
             }
             return rates;
-        }
+        }};
 
         // Handle successful response
-        task.setOnSucceed(e -> {
+        task.setOnSucceeded(e -> {
             currencyRates = task.getValue();
             List<String> currencies = new ArrayList<>(currencyRates.keySet());
-            Collection.sort(currencies);
+            Collections.sort(currencies);
             fromCurrency.setItems(FXCollections.observableArrayList(currencies));
             toCurrency.setItems(FXCollections.observableArrayList(currencies));
             fromCurrency.setValue("NOK");
@@ -128,10 +128,12 @@ public class CurrencyConverter extends Application {
         // Handle unsuccessful rseponse
         task.setOnFailed(e -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContextText("Error while fetching rates. " + task.getException().getMessage());
+            alert.setContentText("Error while fetching rates. " + task.getException().getMessage());
             alert.show();
         });
-    };
+
+        new Thread(task).start();
+    }
 
 
 
